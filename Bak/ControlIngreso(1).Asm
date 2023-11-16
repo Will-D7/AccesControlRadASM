@@ -38,23 +38,56 @@ ciNoExist		db 'Docente no registrado',0
 voidMsg			db '',0
 auxMsg			db 100 dup(0)
 saltoLinea 		db 10,13
+noSubjToday 	db 'No tiene clases HOY',0
+noSubjNow		db 'No tiene Clases AHORA',0
 
 ciOne 			dd 8080808
 DocOne 			db 'MONTECINOS CHOQUE MARCO ANTONIO',10,13,0
 TPBN			db 'TALLER DE PROGRAMACION EN BAJO NIVEL',0
-horaTPBNG1		dd 15
+dia1TPBNG1		DD 2
+hor1TPBNG1		dd 22		;;
 minutosTPBNG1	dd 45
-horaTPBNG2		dd 21				;;
+
+dia2TPBNG1		DD 3
+hor2TPBNG1		DD 15
+
+dia3TPBNG1		dd 4
+hor3TPBNG1		dd 15
+
+dia1TPBNG2		dd 2
+hor1TPBNG2		dd 11				
 minutosTPBNG2	dd 15
+
+dia2TPBNG2		DD 3
+hor2TPBNG2		dd 11
+
+dia3TPBNG2		dd 4
+hor3TPBNG2		dd 11
+
 RedesAvanzadas 	db 'TECNOLOGIA REDES AVANZADAS',0
-horTecRedAvaG1	dd 14
+dia1TecRedAvaG1	DD 2
+hor1TecRedAvaG1	dd 14
 minTecRedAvaG1	dd 15
+
+dia2TecRedAvaG1	dd 3
+hor2TecRedAvaG1	dd 14
+
+dia3TecRedAvaG1	dd 4
+hor3TecRedAvaG1	dd 14
 
 
 ciTwo			dd 7070707
 DocTwo 			db 'BLANCO COCA LETICIA',0
 IntroProgra		db 'INTRODUCCION A LA PROGRAMACION',0
+hor12IntroProg	dd 17
+hor3IntroProg	dd 15
 EPED			db 'ELEMENTOS DE PROGRAMACION Y ESTRUCTURA DE DATOS',0
+hor1EPEDG2		DD 12
+hor23EPEDG2		dd 15
+hor1EPEDG3		dd 18
+hor2EPEDG3		dd 6
+hor3EPEDEG3		dd 15
+
 AlgoAvanzados	db 'ALGORITMOS AVANZADOS',0
 
 ciThree			dd 6060606
@@ -141,27 +174,59 @@ verifyCI:	;Boton OK, para leer y mostrar el contenido de box1(1002) en la box2(1
 		
 		invoke GetLocalTime,myDate;;;;;guardamos la hora inicial
 		xor edx,edx
-	
 		call setSchedule
 		call setSubject
-		;;
-			;invoke SendDlgItemMessage,[pWnd],box3_output,WM_SETTEXT,100,TPBN
-		;;
-			;invoke GetLocalTime,myDate
-		;xor eax,eax
-			;mov ax,[myDate.wHour]
-			;invoke SetDlgItemText,[pWnd],box4_output,timeA
-		;;
-		
-		;
 		jmp endShow
 		
 		otherCiTwo:
+		mov eax,[ciTwo]
+		cmp [input1Var],eax
+		jne otherCiThree
 		
+		invoke SendDlgItemMessage,[pWnd],box2_output,WM_SETTEXT,100,DocTwo
+		mov ebx,0
+		mov bl,[DocTwo]		;guardamos en ebx el docente
+		
+		invoke GetLocalTime,myDate;;;;;guardamos la hora inicial
+		xor edx,edx
+		call setSchedule
+		call setSubject
+		jmp endShow
+		
+		otherCiThree:
+		mov eax,[ciThree]
+		cmp [input1Var],eax
+		jne otherCiFour
+		
+		invoke SendDlgItemMessage,[pWnd],box2_output,WM_SETTEXT,100,DocThree
+		mov ebx,0
+		mov bl,[DocThree]		;guardamos en ebx el docente
+		
+		invoke GetLocalTime,myDate;;;;;guardamos la hora inicial
+		xor edx,edx
+		call setSchedule
+		call setSubject
+		jmp endShow
+		
+		otherCiFour:
+		mov eax,[ciFour]
+		cmp [input1Var],eax
+		jne ciNotFound
+		
+		invoke SendDlgItemMessage,[pWnd],box2_output,WM_SETTEXT,100,DocFour
+		mov ebx,0
+		mov bl,[DocFour]		;guardamos en ebx el docente
+		
+		invoke GetLocalTime,myDate;;;;;guardamos la hora inicial
+		xor edx,edx
+		call setSchedule
+		call setSubject
+		jmp endShow
 		
 		ciNotFound:
 		invoke SendDlgItemMessage,[pWnd],box2_output,WM_SETTEXT,100,ciNoExist
 		invoke SetDlgItemText,[pWnd],box3_output,voidMsg
+		invoke SetDlgItemText,[pWnd],box4_output,voidMsg
 	
 	endShow:	
 	mov eax,1
@@ -182,27 +247,86 @@ finish:				;termina solo el proceso repetitivo
 endp
 
 proc setSchedule
+	;mov dx,[myDate.wHour]
+	mov dx,[myDate.wDayOfWeek]
 	
-	cmp bl,[DocOne]					;;;;;;;;;DOCENTE 1, MARCO MONTECINOS....
-	jne otherDocTwo				
-		mov dx,[myDate.wHour]
+	cmp [input1Var],DocOne
+	je DocOneSchedule
+	cmp [input1Var],DocTwo
+	je DocTwoSchedule
+	cmp [input1Var],DocThree
+	je DocThreeSchedule
+	cmp [input1Var],DocFour
+	je DocFourSchedule
+	
+	
+	DocOneSchedule:
+		cmp edx,2	;[dia1TPBNG1]		;;DOCENTE 1, MARCO MONTECINOS, 2 MATERIAS,total 3G
+		JB noSubjectsToday			; hay clase del dia 2=martes al dia 4=jueves
+		cmp edx,4
+		ja noSubjectsToday
+			mov dx,[myDate.wHour]
+				cmp edx,[hor1TPBNG1]		;horaTPBNG1 es timeG
+				jne verifyHoraTPBNG2
+				invoke SetDlgItemText,[pWnd],box4_output,timeG
+				jmp finSetSchedule
+			
+			verifyHoraTPBNG2:
+				cmp edx,[hor1TPBNG2]		;horaTPBNG2 es timeE
+				jne verifyHourRedes
+				invoke SetDlgItemText,[pWnd],box4_output,timeG
+				jmp finSetSchedule
 		
+			verifyHourRedes:
+				cmp edx,[hor1TecRedAvaG1]
+				jne noSubjectsNow
+	
+	DocTwoSchedule:						;;DOC 2, BLANCO COCA LETICIA, 4 Materias, 5Grupos
+		cmp edx,1
+		jb noSubjectsToday
+		cmp edx,5
+		ja noSubjectsToday
+	
+	 
+	DocThreeSchedule:
+	DocFourSchedule:
+	
+	noSubjectNow:
+		invoke SetDlgItemText,[pWnd],box4_output,noSubjNow
+		jmp finSetSchedule
+	noSubjectsToday:
+		invoke SetDlgItemText,[pWnd],box4_output,noSubjToday
+		jmp finSetSchedule
+	
+	
+	;invoke SetDlgItemInt,[pWnd],box4_output,edx,0
+	cmp bl,[DocOne]					;;;;;;;;;DOCENTE 1, MARCO MONTECINOS....
+	jne otherDocTwo
 		;mov ax,[myDate.wMinute]
-			cmp edx,[horaTPBNG1] ;horaTPBNG1 es timeG
+			cmp edx,[hor1TPBNG1] ;horaTPBNG1 es timeG
 			jne verifyHoraTPBNG2
 			invoke SetDlgItemText,[pWnd],box4_output,timeG
 			jmp finSetSchedule
 		
-		verifyHoraTPBNG2:
-			cmp edx,[horaTPBNG2] ;horaTPBNG2 es timeD
+		verifyHoraTPBNG2x:
+			cmp edx,[hor1TPBNG2] ;horaTPBNG2 es timeD
 			jne verifyHoraRedesAv
 			invoke SetDlgItemText,[pWnd],box4_output,timeD
 			jmp finSetSchedule
 			
 		verifyHoraRedesAv: 
+			cmp edx,[hor1TecRedAvaG1]	;timeF es 14:15
+			jne otherDocTwo				;;;;;;;;;;;sinmaterias a impartir 
+			invoke SetDlgItemText,[pWnd],box4_output,timeF
+			jmp finSetSchedule
+			
 		
 	otherDocTwo:
+	cmp bl,[DocTwo]
+	jne otherDocThree
+		;cmp edx,[hora]
 	
+	otherDocThree:
 	
 	finSetSchedule:
 	ret
@@ -212,7 +336,7 @@ proc setSubject
 	
 	cmp bl,[DocOne]					;;;;;;;;;DOCENTE 1, MARCO MONTECINOS....
 	jne otherDoc2Subj						;;;;;;;;HORARIO 1, BAJO NIVEL			
-		cmp edx,[horaTPBNG1] ;horaTPBNG1 es timeG = 15:45 - 17:15, ESO ES BAJO NIVEL G1
+		cmp edx,[hor1TPBNG1] ;horaTPBNG1 es timeG = 15:45 - 17:15, ESO ES BAJO NIVEL G1
 		jne otherSubjDocOne
 			invoke SetDlgItemText,[pWnd],box3_output,TPBN
 			jmp finSetSubject
