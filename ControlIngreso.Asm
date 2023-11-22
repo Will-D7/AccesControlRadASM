@@ -315,7 +315,7 @@ proc setSchedule
 			je marCuatroDocOne
 			cmp edx,17
 			je marCincoDocOne
-			
+			ja noSubjectsToday
 			
 			marOnceDocOne:
 				call takeMinA
@@ -574,7 +574,7 @@ proc setSchedule
 		jmp noSubjectsToday
 		
 		lunDocTwo:
-			call takeMinA
+			call takeHorA
 			cmp edx,12
 			jb noSubjectsNow
 			je lunDocTwoDoce
@@ -582,6 +582,7 @@ proc setSchedule
 			je lunDocTwoUna
 			cmp edx,14
 			je lunDocTwoDos
+			jmp noSubjectsToday
 			lunDocTwoDoce:
 				call takeMinA
 				cmp edx,45
@@ -606,6 +607,7 @@ proc setSchedule
 				jmp finSetSchedule
 		
 		marDocTwo:
+			call takeHorA
 			cmp edx,6
 			jb noSubjectsNow
 			je marDocTwoSeis
@@ -624,7 +626,7 @@ proc setSchedule
 			je marDocTwoSieteT
 			cmp edx,20
 			je marDocTwoOchoT
-			ja noSubjectsToday
+			jmp noSubjectsToday
 			
 			marDocTwoSeis:
 				call takeMinA
@@ -715,7 +717,7 @@ proc setSchedule
 			je mieDocTwoCinco
 			cmp edx,18
 			je mieDocTwoSeisT
-			ja noSubjectsToday
+			jmp noSubjectsToday
 			
 			mieDocTwoSeis:
 				call takeMinA
@@ -812,7 +814,7 @@ proc setSchedule
 			je jueDocTwoCuatro
 			cmp edx,17
 			je jueDocTwoCinco
-			ja noSubjectsToday
+			jmp noSubjectsToday;;;;
 			
 			jueDocTwoSeis:
 				call takeMinA
@@ -1474,6 +1476,7 @@ proc setSchedule
 	
 	DocFiveSchedule:
 		cmp edx,1
+		;;;;;jb noSubjectsToday
 		je lunDocFive
 		cmp edx,2
 		je marDocFive
@@ -1643,6 +1646,7 @@ proc setSchedule
 			je vieDiezDocFive
 			cmp edx,11
 			je vieOnceDocFive
+			jmp noSubjectsToday
 			
 			vieOchoDocFive:
 				call takeMinA
@@ -1721,8 +1725,8 @@ proc setSchedule
 		invoke SetDlgItemText,[pWnd],box6_output,noSubjToday
 		jmp finSetSchedule
 	msgLater:
-	invoke SetDlgItemText,[pWnd],box6_output,later
-	mov [bAtraso],0
+		invoke SetDlgItemText,[pWnd],box6_output,later
+		mov [bAtraso],0
 	
 	finSetSchedule:
 	ret
@@ -1730,21 +1734,21 @@ endp
 
 proc takeHorA
 	mov edx,1
-	;mov dx,[myDate.wHour]
-	mov dx,7
+	mov dx,[myDate.wHour]
+	;mov dx,6
 	ret
 endp
 proc takeMinA
 	mov edx,1
-	;mov dx,[myDate.wMinute]
-	mov dx,16
+	mov dx,[myDate.wMinute]
+	;mov dx,44
 	ret
 endp
 
 proc takeDayWeekA
 	mov edx,1
-	;mov dx,[myDate.wDayOfWeek]
-	mov dx,5
+	mov dx,[myDate.wDayOfWeek]
+	;mov dx,5
 	ret
 endp
 

@@ -34,8 +34,10 @@ timeTres		DB '15:45 - 17:15',0
 timeCinco		DB '17:15 - 18:45',0
 timeSeisT		db '18:45 - 20:15',0
 timeOchoT		db '20:15 - 21:45',0
-noSubjToday 	db 'No tiene Clases HOY',0
-noSubjNow		db 'No tiene Clases AHORA',0
+;noSubjToday 	db 'No tiene Clases HOY',0
+noSubjToday 	db 'NO HAY CLASES EN CURSO',0
+;noSubjNow		db 'No tiene Clases AHORA',0
+noSubjNow		db 'NO HAY CLASES EN CURSO',0
 later			db 'ATRASO',0
 bAtraso			dd 0
 ;;;;;;;;;;;;;;;; AULAS ;;;;;;;;;;;;;;;;;;;;;;;
@@ -313,7 +315,7 @@ proc setSchedule
 			je marCuatroDocOne
 			cmp edx,17
 			je marCincoDocOne
-			
+			ja noSubjectsToday
 			
 			marOnceDocOne:
 				call takeMinA
@@ -572,7 +574,7 @@ proc setSchedule
 		jmp noSubjectsToday
 		
 		lunDocTwo:
-			call takeMinA
+			call takeHorA
 			cmp edx,12
 			jb noSubjectsNow
 			je lunDocTwoDoce
@@ -580,6 +582,7 @@ proc setSchedule
 			je lunDocTwoUna
 			cmp edx,14
 			je lunDocTwoDos
+			jmp noSubjectsToday
 			lunDocTwoDoce:
 				call takeMinA
 				cmp edx,45
@@ -604,6 +607,7 @@ proc setSchedule
 				jmp finSetSchedule
 		
 		marDocTwo:
+			call takeHorA
 			cmp edx,6
 			jb noSubjectsNow
 			je marDocTwoSeis
@@ -622,7 +626,7 @@ proc setSchedule
 			je marDocTwoSieteT
 			cmp edx,20
 			je marDocTwoOchoT
-			ja noSubjectsToday
+			jmp noSubjectsToday
 			
 			marDocTwoSeis:
 				call takeMinA
@@ -713,7 +717,7 @@ proc setSchedule
 			je mieDocTwoCinco
 			cmp edx,18
 			je mieDocTwoSeisT
-			ja noSubjectsToday
+			jmp noSubjectsToday
 			
 			mieDocTwoSeis:
 				call takeMinA
@@ -875,6 +879,8 @@ proc setSchedule
 				jmp finSetSchedule
 		
 		vieDocTwo:
+			;;;;;;;;;;;;;
+			call takeHorA		
 			cmp edx,6
 			jb noSubjectsNow
 			je vieDocTwoSeis
@@ -1726,21 +1732,21 @@ endp
 
 proc takeHorA
 	mov edx,1
-	;mov dx,[myDate.wHour]
-	mov dx,7
+	mov dx,[myDate.wHour]
+	;mov dx,6
 	ret
 endp
 proc takeMinA
 	mov edx,1
-	;mov dx,[myDate.wMinute]
-	mov dx,16
+	mov dx,[myDate.wMinute]
+	;mov dx,44
 	ret
 endp
 
 proc takeDayWeekA
 	mov edx,1
-	;mov dx,[myDate.wDayOfWeek]
-	mov dx,5
+	mov dx,[myDate.wDayOfWeek]
+	;mov dx,5
 	ret
 endp
 

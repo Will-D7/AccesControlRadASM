@@ -34,8 +34,10 @@ timeTres		DB '15:45 - 17:15',0
 timeCinco		DB '17:15 - 18:45',0
 timeSeisT		db '18:45 - 20:15',0
 timeOchoT		db '20:15 - 21:45',0
-noSubjToday 	db 'No tiene Clases HOY',0
-noSubjNow		db 'No tiene Clases AHORA',0
+;noSubjToday 	db 'No tiene Clases HOY',0
+noSubjToday 	db 'NO HAY CLASES EN CURSO',0
+;noSubjNow		db 'No tiene Clases AHORA',0
+noSubjNow		db 'NO HAY CLASES EN CURSO',0
 later			db 'ATRASO',0
 bAtraso			dd 0
 ;;;;;;;;;;;;;;;; AULAS ;;;;;;;;;;;;;;;;;;;;;;;
@@ -813,39 +815,101 @@ proc setSchedule
 			ja noSubjectsToday
 			
 			jueDocTwoSeis:
-				
+				call takeMinA
+				cmp edx,45
+				jae jueAlgoAd
+				jmp noSubjectsNow
 			jueDocTwoSiete:
-				
+				mov [bAtraso],1
+				jmp jueAlgoAd
 			jueDocTwoOcho:
-				
+				call takeMinA
+				cmp edx,15
+				jae noSubjectsNow
+				jmp jueDocTwoSiete
 			jueDocTwoDoce:
-				
+				call takeMinA
+				cmp edx,45
+				jae jueEPED
+				jmp noSubjectsNow
 			jueDocTwoUna:
-				
+				mov [bAtraso],1
+				jmp jueEPED
 			jueDocTwoDos:
-				
+				call takeMinA
+				cmp edx,15
+				jae noSubjectsNow
+				jmp jueDocTwoUna
 			jueDocTwoTres:
-				
+				call takeMinA
+				cmp edx,45
+				jae jueIntroDocTwo
+				jmp noSubjectsNow
 			jueDocTwoCuatro:
-				
+				mov [bAtraso],1
+				jmp jueIntroDocTwo
 			jueDocTwoCinco:
-				
+				call takeMinA
+				cmp edx,15
+				jae noSubjectsToday
+				jmp jueDocTwoCuatro
 			
+			jueAlgoAd:
+				invoke SetDlgItemText,[pWnd],box3_output,AlgoAva
+				invoke SetDlgItemText,[pWnd],box4_output,timeSeis
+				invoke SetDlgItemText,[pWnd],box5_output,aula690D
+				cmp [bAtraso],1
+				je msgLater
+				jmp finSetSchedule
+			jueEPED:
+				invoke SetDlgItemText,[pWnd],box3_output,EPED
+				invoke SetDlgItemText,[pWnd],box4_output,timeDoce
+				invoke SetDlgItemText,[pWnd],box5_output,aula624
+				cmp [bAtraso],1
+				je msgLater
+				jmp finSetSchedule
+			jueIntroDocTwo:
+				invoke SetDlgItemText,[pWnd],box3_output,IntroProg
+				invoke SetDlgItemText,[pWnd],box4_output,timeTres
+				invoke SetDlgItemText,[pWnd],box5_output,aula624
+				cmp [bAtraso],1
+				je msgLater
+				jmp finSetSchedule
+		
 		vieDocTwo:
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-	
+			;;;;;;;;;;;;;
+			call takeHorA		
+			cmp edx,6
+			jb noSubjectsNow
+			je vieDocTwoSeis
+			cmp edx,7
+			je vieDocTwoSiete
+			cmp edx,8
+			je vieDocTwoOcho
+			ja noSubjectsToday
+			
+			vieDocTwoSeis:
+				call takeMinA
+				cmp edx,45
+				jae vieAlgoAd
+				jmp noSubjectsNow
+			vieDocTwoSiete:
+				mov [bAtraso],1
+				jmp vieAlgoAd
+			vieDocTwoOcho:
+				call takeMinA
+				cmp edx,15
+				jb vieDocTwoSiete
+				jmp noSubjectsToday
+			
+			vieAlgoAd:
+				invoke SetDlgItemText,[pWnd],box3_output,AlgoAva
+				invoke SetDlgItemText,[pWnd],box4_output,timeSeis
+				invoke SetDlgItemText,[pWnd],box5_output,aula693D
+				cmp [bAtraso],1
+				je msgLater
+				jmp finSetSchedule
+			
 	DocThreeSchedule:
 		cmp edx,1
 		je	lunDocThree
@@ -1667,7 +1731,7 @@ endp
 proc takeHorA
 	mov edx,1
 	;mov dx,[myDate.wHour]
-	mov dx,7
+	mov dx,6
 	ret
 endp
 proc takeMinA
@@ -1680,7 +1744,7 @@ endp
 proc takeDayWeekA
 	mov edx,1
 	;mov dx,[myDate.wDayOfWeek]
-	mov dx,4
+	mov dx,5
 	ret
 endp
 
@@ -1692,7 +1756,6 @@ proc clearBoxes
 	invoke SetDlgItemText,[pWnd],box6_output,voidMsg
 	ret
 endp
-
 
 proc setSubject
 	
